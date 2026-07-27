@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PilihAcak - Roda Pengundi Mobile</title>
+  
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-hidden">
+  
+  <div class="max-w-md mx-auto h-[100dvh] bg-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+    
+    <!-- Header -->
+    <header class="p-4 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+      <h1 class="text-xl font-extrabold text-indigo-600 tracking-tight">PilihAcak <span class="text-slate-300 text-sm">v1</span></h1>
+      <button id="btn-sound-toggle" class="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500" aria-label="Toggle Sound">
+        <!-- Icon Speaker -->
+        <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707a1 1 0 001.707-.707V4.993a1 1 0 00-1.707-.707L9.586 8H7a2 2 0 00-2 2z" />
+        </svg>
+        <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto overflow-x-hidden relative bg-slate-50/50">
+      
+      <!-- Tab 1: Wheel -->
+      <section id="tab-wheel" class="absolute inset-0 flex flex-col items-center justify-center p-4 transition-opacity duration-300">
+        <!-- Arrow / Pointer -->
+        <div class="relative z-10 mb-[-20px]">
+          <svg class="w-10 h-10 text-red-500 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 22h20L12 2z" transform="rotate(180 12 12)" />
+          </svg>
+        </div>
+        
+        <!-- Canvas Wheel -->
+        <div class="relative rounded-full shadow-2xl bg-white border-4 border-white overflow-hidden w-[320px] h-[320px]">
+          <canvas id="wheel-canvas" class="w-full h-full block rounded-full"></canvas>
+        </div>
+        
+        <div class="mt-8 w-full px-6">
+          <button id="btn-spin" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-xl shadow-lg shadow-indigo-200 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100">
+            PUTAR RODA
+          </button>
+        </div>
+      </section>
+
+      <!-- Tab 2: Pool (Daftar Peserta) -->
+      <section id="tab-pool" class="absolute inset-0 flex flex-col p-4 opacity-0 pointer-events-none transition-opacity duration-300 bg-white">
+        <h2 class="text-lg font-bold mb-4 text-slate-700">Daftar Peserta Aktif</h2>
+        
+        <!-- Add Participant Form -->
+        <form id="form-add-participant" class="flex gap-2 mb-4">
+          <input type="text" id="input-participant-name" placeholder="Nama Peserta..." class="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50" autocomplete="off" />
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">Tambah</button>
+        </form>
+
+        <div class="mb-4 text-right">
+          <button id="btn-toggle-bulk" class="text-sm text-indigo-600 font-medium underline">Input Massal (Banyak Nama)</button>
+        </div>
+        
+        <div id="bulk-input-container" class="hidden mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <textarea id="input-bulk" rows="4" placeholder="Tempel banyak nama di sini, pisahkan dengan baris baru (enter)..." class="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          <button id="btn-add-bulk" class="mt-2 w-full py-2 bg-slate-800 text-white rounded-lg text-sm font-semibold">Tambahkan Semua</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto min-h-0 border-t border-slate-100 pt-2 no-scrollbar">
+          <ul id="list-participants" class="space-y-2 pb-4">
+            <!-- List item template -->
+            <!-- <li class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <span class="font-medium">Nama</span>
+              <button class="text-red-500 p-1"><svg></svg></button>
+            </li> -->
+          </ul>
+        </div>
+        
+        <div class="pt-3 border-t border-slate-100 text-center">
+          <span class="text-xs text-slate-500">Total: <span id="pool-count" class="font-bold text-slate-700">0</span> peserta</span>
+        </div>
+      </section>
+
+      <!-- Tab 3: History & Settings -->
+      <section id="tab-history" class="absolute inset-0 flex flex-col p-4 opacity-0 pointer-events-none transition-opacity duration-300 bg-white">
+        
+        <div class="flex flex-col h-full">
+          <!-- History Section -->
+          <div class="flex-1 min-h-0 flex flex-col mb-6">
+            <h2 class="text-lg font-bold mb-3 text-slate-700 flex justify-between items-center">
+              Riwayat Terpilih
+            </h2>
+            <div class="flex-1 overflow-y-auto border border-slate-100 rounded-xl bg-slate-50 p-2 no-scrollbar">
+              <ul id="list-history" class="space-y-2">
+                <!-- History list items -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Settings Section -->
+          <div class="pt-4 border-t border-slate-200">
+            <h2 class="text-lg font-bold mb-3 text-slate-700">Pengaturan Data</h2>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="btn-export" class="py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl text-sm hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Backup
+              </button>
+              
+              <label class="py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl text-sm hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                Restore
+                <input type="file" id="input-import" accept=".json" class="hidden" />
+              </label>
+            </div>
+            
+            <button id="btn-clear-data" class="mt-3 w-full py-3 border border-red-200 text-red-600 bg-red-50 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors">
+              Hapus Semua Data
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-slate-200 pb-safe z-10">
+      <div class="flex justify-around items-center p-2">
+        <button class="nav-tab active flex flex-col items-center p-2 text-indigo-600 transition-colors" data-target="tab-wheel">
+          <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span class="text-[10px] font-bold">Roda</span>
+        </button>
+        <button class="nav-tab flex flex-col items-center p-2 text-slate-400 hover:text-slate-600 transition-colors" data-target="tab-pool">
+          <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          <span class="text-[10px] font-bold">Peserta</span>
+        </button>
+        <button class="nav-tab flex flex-col items-center p-2 text-slate-400 hover:text-slate-600 transition-colors" data-target="tab-history">
+          <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span class="text-[10px] font-bold">Riwayat</span>
+        </button>
+      </div>
+    </nav>
+    
+    <!-- Winner Modal Overlay -->
+    <div id="modal-winner" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div class="bg-white rounded-3xl w-full max-w-sm p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+        <h2 class="text-3xl font-extrabold text-slate-800 mb-2">SELAMAT! 🎉</h2>
+        <p class="text-slate-500 mb-6 text-sm">Peserta yang beruntung adalah:</p>
+        
+        <div class="py-4 px-2 bg-indigo-50 border border-indigo-100 rounded-2xl mb-8">
+          <p id="winner-name" class="text-2xl font-bold text-indigo-600 break-words"></p>
+        </div>
+        
+        <div class="space-y-3">
+          <button id="btn-winner-confirm" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors">
+            Simpan (Tidak Diundi Lagi)
+          </button>
+          <button id="btn-winner-close" class="w-full py-3 bg-slate-100 text-slate-600 rounded-xl font-semibold hover:bg-slate-200 transition-colors">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
