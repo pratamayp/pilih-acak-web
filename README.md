@@ -1,11 +1,12 @@
 # PilihAcak 🎡
 
-A fast, lightweight, and serverless **Mobile-First Single Page Application (SPA)** designed to randomly pick participants using a premium, highly responsive wheel spinner. Built with privacy in mind, all data is stored locally in the user's browser via `localStorage`.
+A fast, lightweight, and serverless **Progressive Web App (PWA)** designed to randomly pick participants using a premium, highly responsive wheel spinner. Built with privacy in mind, all data is stored locally in the user's browser via `localStorage`.
 
 ---
 
 ## Key Features
 
+- **📲 PWA Installable:** Install it directly to your home screen like a native mobile app for offline support and fullscreen experience.
 - **📱 Mobile-First Layout:** Tailored and optimized for mobile screens (bounded container style) with smooth bottom tab navigation.
 - **✨ Crisp Retina Display Support:** Auto-adjusts resolution based on `devicePixelRatio` to prevent pixelation on high-DPI (Retina) screens.
 - **🎨 Dynamic High-Contrast Colors:** Uses the **Golden Angle distribution** (`(index * 137.5) % 360` degrees HSL) to assign a unique, highly contrasting color to every slice—scaling cleanly for 20+ names.
